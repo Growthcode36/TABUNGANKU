@@ -1,5 +1,6 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+
 const app = express();
 const port = 3000;
 
@@ -8,18 +9,20 @@ app.use(express.json());
 
 let userLocation = null;
 
-app.post('/save-location', (req, res) => {
+// API untuk menyimpan lokasi pengguna
+app.post("/save-location", (req, res) => {
     const { latitude, longitude } = req.body;
     userLocation = { latitude, longitude };
     console.log(`Lokasi diterima: Latitude = ${latitude}, Longitude = ${longitude}`);
-    res.send("Lokasi diterima!");
+    res.send("Lokasi berhasil disimpan!");
 });
 
-app.get('/get-location', (req, res) => {
+// API untuk mendapatkan lokasi yang tersimpan
+app.get("/get-location", (req, res) => {
     if (userLocation) {
         res.json(userLocation);
     } else {
-        res.status(404).send("Belum ada lokasi yang diterima.");
+        res.status(404).send("Belum ada lokasi yang tersimpan.");
     }
 });
 
