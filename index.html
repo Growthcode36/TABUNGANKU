@@ -3,72 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dapatkan Lokasi</title>
+    <title>Bagikan Lokasi</title>
 </head>
 <body>
-    <h2>Klik tombol di bawah untuk membagikan lokasi Anda</h2>
-    <button onclick="getLocation()">Bagikan Lokasi</button>
-
-    <h3>Lokasi Anda:</h3>
-    <div id="map" style="width: 100%; height: 400px;"></div>
+    <h2>Bagikan Lokasi Anda</h2>
+    <button id="share-location">Bagikan Lokasi</button>
+    <p id="status"></p>
 
     <script>
-        function getLocation() {
+        document.getElementById("share-location").addEventListener("click", function () {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        document.getElementById("status").innerText = `Lokasi Anda: ${latitude}, ${longitude}`;
+                        
+                        // Kirim ke server
+                        fetch("http://localhost:3000/save-location", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ latitude, longitude }),
+                        })
+                        .then((response) => response.text())
+                        .then((data) => console.log(data))
+                        .catch((error) => console.error("Error:", error));
+                    },
+                    (error) => {
+                        document.getElementById("status").innerText = "Gagal mendapatkan lokasi: " + error.message;
+                    }
+                );
             } else {
-                alert("Geolocation tidak didukung oleh browser ini.");
+                document.getElementById("status").innerText = "Geolocation tidak didukung di browser ini.";
             }
-        }
-
-        function sendLocation(position) {
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
-
-            // Kirim data lokasi ke server
-            fetch('http://localhost:3000/save-location', { 
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ latitude, longitude })
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert("Lokasi berhasil dikirim!");
-                showMap(latitude, longitude);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function showMap(lat, lng) {
-            let map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: lat, lng: lng },
-                zoom: 15
-            });
-
-            new google.maps.Marker({
-                position: { lat: lat, lng: lng },
-                map: map
-            });
-        }
-
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("Pengguna menolak permintaan lokasi.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Informasi lokasi tidak tersedia.");
-                    break;
-                case error.TIMEOUT:
-                    alert("Permintaan lokasi melebihi batas waktu.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("Terjadi kesalahan yang tidak diketahui.");
-                    break;
-            }
-        }
+        });
     </script>
-
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEYr3jHYTxteydlLNjJK5B0Fxiykuoqco"></script>
 </body>
 </html>
