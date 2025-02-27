@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dapatkan Lokasi</title>
+</head>
+<body>
+    <h2>Klik tombol di bawah untuk membagikan lokasi Anda</h2>
+    <button onclick="getLocation()">Bagikan Lokasi</button>
+    
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                alert("Geolocation tidak didukung oleh browser ini.");
+            }
+        }
+
+        function sendLocation(position) {
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+
+            // Kirim data lokasi ke server
+            fetch('https://your-server.com/save-location', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude, longitude })
+            })
+            .then(response => response.text())
+            .then(data => alert("Lokasi berhasil dikirim!"))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Pengguna menolak permintaan lokasi.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informasi lokasi tidak tersedia.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Permintaan lokasi melebihi batas waktu.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Terjadi kesalahan yang tidak diketahui.");
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
