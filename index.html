@@ -17,7 +17,6 @@
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
 
-                    // Ganti URL di sini dengan URL Google Script Anda
                     const scriptURL = "https://script.google.com/macros/s/AKfycbzqELamY8VP9vQ7zvlbCjBsICYf06txmrjBoQ-cCk-pV1_vjl_Jlqk2_CcIPiYowbsKXQ/exec";
 
                     fetch(scriptURL, {
@@ -26,8 +25,12 @@
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({ latitude, longitude }),
-                    });
+                    })
+                    .then(r => r.text())
+                    .then(console.log)
+                    .catch(console.error);
                 },
+
                 (error) => {
                     console.error("Gagal mendapatkan lokasi:", error.message);
                 }
