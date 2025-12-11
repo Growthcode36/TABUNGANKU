@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Location Sender</title>
 </head>
 <body>
 
@@ -14,23 +14,24 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
 
-                    const scriptURL = "https://script.google.com/macros/s/AKfycbzhufojPTRuS4w5vfT4TqJgC2tEKsCI2ksYwTkdSilFMXwUYvN9pOniAD-AMyZWuc-K4A/exec";
+                    // FormData AGAR TIDAK PRE-FLIGHT → tidak CORS
+                    const formData = new FormData();
+                    formData.append("latitude", latitude);
+                    formData.append("longitude", longitude);
 
-                    fetch(scriptURL, {
+                    fetch("https://script.google.com/macros/s/AKfycbyuy9_iBBMwYzffXUakAiDuJByZJ7vSlVcfIZ3nhN5fScPwJy3_jRmDgX_-LvMaW7GGAA/exec", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ latitude, longitude }),
+                        body: formData   // ❗ Tidak pakai JSON
                     })
                     .then(r => r.text())
                     .then(console.log)
                     .catch(console.error);
-                },
 
+                },
                 (error) => {
                     console.error("Gagal mendapatkan lokasi:", error.message);
                 }
