@@ -1,25 +1,41 @@
 const express = require("express");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
+
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
 
-let userLocation = null;
-
-app.post("/save-location", (req, res) => {
-    const { latitude, longitude } = req.body;
-    userLocation = { latitude, longitude };
-    console.log(`Lokasi diterima → Latitude: ${latitude}, Longitude: ${longitude}`);
-    res.send("Lokasi berhasil disimpan!");
+// KONFIG EMAIL (gunakan Gmail)
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "ngodingbareng@gmail.com",
+        pass: "MASUKKAN_PASSWORD_APLIKASI",
+    },
 });
 
-app.get("/get-location", (req, res) => {
-    if (userLocation) {
-        res.json(userLocation);
-    } else {
-        res.status(404).send("Belum ada lokasi yang tersimpan.");
+// API simpan + kirim email
+app.post("/save-location", async (req, res) => {
+    const { latitude, longitude } = req.body;
+
+    console.log(`Lokasi diterima: ${latitude}, ${longitude}`);
+
+    // Kirim email ke developer
+    try {
+        await transporter.sendMail({
+            from: "Location Bot <ngodingbareng@gmail.com>",
+            to: "ngodingbareng@gmail.com",
+            subject: "Lokasi Pengunjung Baru",
+            text: `Lokasi pengguna:\nLatitude: ${latitude}\nLongitude: ${longitude}`,
+        });
+
+        res.send("Lokasi disimpan & email terkirim!");
+    } catch (error) {
+        console.error("Gagal kirim email:", error);
+        res.status(500).send("Lokasi tersimpan tapi email gagal dikirim.");
     }
 });
 
