@@ -12,7 +12,7 @@ let userLocation = null;
 app.post("/save-location", (req, res) => {
     const { latitude, longitude } = req.body;
     userLocation = { latitude, longitude };
-    console.log(`Lokasi diterima: Latitude = ${latitude}, Longitude = ${longitude}`);
+    console.log(`Lokasi diterima → Latitude: ${latitude}, Longitude: ${longitude}`);
     res.send("Lokasi berhasil disimpan!");
 });
 
