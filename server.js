@@ -8,7 +8,6 @@ app.use(express.json());
 
 let userLocation = null;
 
-// API untuk menyimpan lokasi pengguna
 app.post("/save-location", (req, res) => {
     const { latitude, longitude } = req.body;
     userLocation = { latitude, longitude };
@@ -16,7 +15,6 @@ app.post("/save-location", (req, res) => {
     res.send("Lokasi berhasil disimpan!");
 });
 
-// API untuk mendapatkan lokasi yang tersimpan
 app.get("/get-location", (req, res) => {
     if (userLocation) {
         res.json(userLocation);
